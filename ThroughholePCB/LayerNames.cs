@@ -8,6 +8,9 @@ namespace ThroughholePCB
 {
     public static class LayerNames
     {
-        public const string CopperTopLayer = "topLayer";
+        public const string CopperTopLayer = "copperTop";
+        public const string CopperBottomLayer = "copperBottom";
+        public const string SilkScreenTop = "silkscreenTop";
+        public const string SilkScreenBottom = "silkscreenBottom";
     }
 }

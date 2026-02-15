@@ -10,6 +10,13 @@ namespace ThroughholePCB.Tools
     {
         public float OuterRadius { get; set; } = 50;
         public float InnerRadius { get; set; } = 20;
+        private SolidBrush holeBrush = new SolidBrush(Color.White);
+
+        public Color HoleColor
+        {
+            get { return holeBrush.Color; }
+            set { holeBrush.Color = value; }
+        }
 
         public HoleTool(MainForm mainForm, ToolStripButton button) : base(mainForm, button)
         {
@@ -22,7 +29,7 @@ namespace ThroughholePCB.Tools
             var halfInner = InnerRadius / 2;
             if (e.Button == MouseButtons.Left)
             {
-                g.FillEllipse(Brushes.White, pos.X - halfOuter, pos.Y - halfOuter, OuterRadius, OuterRadius);
+                g.FillEllipse(holeBrush, pos.X - halfOuter, pos.Y - halfOuter, OuterRadius, OuterRadius);
                 g.FillEllipse(Brushes.Black, pos.X - halfInner, pos.Y - halfInner, InnerRadius, InnerRadius);
             }
             else if (e.Button == MouseButtons.Right)

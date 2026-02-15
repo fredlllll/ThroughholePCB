@@ -37,8 +37,7 @@ namespace ThroughholePCB
             holeTool = new HoleTool(this, toolHoleBtn);
 
             //set wire tool as default
-            currentTool = wireTool;
-            wireTool.Enable();
+            SetTool(wireTool);
 
             //initialize application
             New(50, 50, PrinterDatas.DefaultPrinter);
@@ -57,10 +56,12 @@ namespace ThroughholePCB
             }
         }
 
+        [MemberNotNull(nameof(currentTool))]
         public void SetTool(ITool tool)
         {
-            currentTool.Disable();
+            currentTool?.Disable(); //is null on startup
             currentTool = tool;
+            propertyGrid.SelectedObject = tool;
             currentTool.Enable();
         }
 
@@ -95,7 +96,7 @@ namespace ThroughholePCB
 
             var layers = new Dictionary<string, Image>()
             {
-                {LayerNames.CopperTopLayer,Util.CreateImageCleared(widthPx,heightPx,PixelFormat.Format32bppArgb,Color.Black) }
+                {LayerNames.CopperTopLayer,ImageUtil.CreateImageCleared(widthPx,heightPx,PixelFormat.Format32bppArgb,Color.Black) }
             };
 
             LoadData(layers, printerData);
@@ -195,18 +196,22 @@ namespace ThroughholePCB
         private void ExportToolStripMenuItem_Click(object sender, EventArgs e)
         {
             //TODO: this is just a crutch for exporting to my printers format. actually determine format by printer type in the future
-            var src = workareaPictureBox.Image;
-            using var tmpImage = Util.CreateImageCleared(CurrentPrinter.DisplayWidthPx, CurrentPrinter.DisplayHeightPx,PixelFormat.Format32bppArgb,Color.Black);
+            var src = ImageUtil.CreateMask((Bitmap)workareaPictureBox.Image);
+            using var tmpImage = ImageUtil.CreateImageCleared(CurrentPrinter.DisplayWidthPx, CurrentPrinter.DisplayHeightPx, PixelFormat.Format32bppArgb, Color.Black);
             using var g = Graphics.FromImage(tmpImage);
             g.DrawImage(src, src.Width, 0, -src.Width, src.Height);
             g.Flush(System.Drawing.Drawing2D.FlushIntention.Sync);
 
-            tmpImage.Save("tmpout.png");
+            var imageName = Path.ChangeExtension(currentFileName, ".png");
+
+            tmpImage.Save(imageName);
 
             var psi = new ProcessStartInfo();
             psi.FileName = Path.GetFullPath("ImageToPrinter\\ImageToPrinter.exe");
-            psi.ArgumentList.Add("tmpout.png");
-            Process.Start(psi);
+            psi.ArgumentList.Add(imageName);
+            using var p = Process.Start(psi);
+            p.WaitForExit();
+            //File.Delete(imageName);
         }
     }
 }

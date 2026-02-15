@@ -15,7 +15,7 @@ namespace ImageToPrinter
             string fullInputPath = Path.GetFullPath(args[0]); /*"I:\\Projects\\PCB3D\\Unbenannt.png"*/
             Console.WriteLine(fullInputPath);
             string outputPath = Path.Combine(Path.GetDirectoryName(fullInputPath)!, Path.GetFileNameWithoutExtension(fullInputPath) + ".pmx2");
-            float exposureTime = 20;
+            float exposureTime = 30;
 
             byte[] inputImage = File.ReadAllBytes(fullInputPath);
             Image<Rgba32> image = Image.Load<Rgba32>(inputImage);

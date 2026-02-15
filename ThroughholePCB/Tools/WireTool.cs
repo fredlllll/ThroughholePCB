@@ -12,6 +12,7 @@ namespace ThroughholePCB.Tools
         private bool hasMouseBeenPressed = false;
         private Point startPos, endPos;
         private Pen pen;
+        private SolidBrush leftMouseBrush = new SolidBrush(Color.White);
 
         public float Radius
         {
@@ -22,6 +23,18 @@ namespace ThroughholePCB.Tools
             set
             {
                 pen.Width = value;
+            }
+        }
+
+        public Color WireColorLeftMouse
+        {
+            get
+            {
+                return leftMouseBrush.Color;
+            }
+            set
+            {
+                leftMouseBrush.Color = value;
             }
         }
 
@@ -78,7 +91,7 @@ namespace ThroughholePCB.Tools
                 hasMouseBeenPressed = true;
                 if (e.Button == MouseButtons.Left)
                 {
-                    pen.Brush = Brushes.White;
+                    pen.Brush = leftMouseBrush;
                 }
                 else
                 {
