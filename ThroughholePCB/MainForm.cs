@@ -28,6 +28,9 @@ namespace ThroughholePCB
         {
             InitializeComponent();
 
+            topRuler1.mainForm = this;
+            leftRuler1.mainForm = this;
+
             gridToggler = new GridToggler(toolGridBtn, layeredCanvas.Grid);
 
             //initialize tools
@@ -48,6 +51,16 @@ namespace ThroughholePCB
             SetTool(wireTool);
 
             FormClosing += MainForm_FormClosing;
+
+            Shown += MainForm_Shown;
+        }
+
+        private void MainForm_Shown(object? sender, EventArgs e)
+        {
+            //for some reason the panel refuses to scroll to anything but the top ruler,
+            //which makes it hide the left ruler till you manually scroll back
+            //only solution i found was to force a dummy panel into view here. doesnt work in form.load event
+            panel1.ScrollControlIntoView(panel2);
         }
 
         private void MainForm_FormClosing(object? sender, FormClosingEventArgs e)
@@ -125,7 +138,7 @@ namespace ThroughholePCB
                 {
                     throw new UnreachableException(); //shouldnt be possible
                 }
-                New(newDialog.WidthParameter, newDialog.HeightParameter, printer);
+                New(newDialog.BoardWidthMm, newDialog.BoardHeightMm, printer);
             }
         }
 
@@ -151,6 +164,9 @@ namespace ThroughholePCB
 
             layeredCanvas.Grid.SpacingX = printerData.PixelsPerMmX * 2.54f;
             layeredCanvas.Grid.SpacingY = printerData.PixelsPerMmY * 2.54f;
+
+            leftRuler1.Height = layeredCanvas.Height;
+            topRuler1.Width = layeredCanvas.Width;
 
             toolStripStatusLabel.Text = $"{printerData.Name} {width}x{height}";
         }
@@ -324,5 +340,20 @@ namespace ThroughholePCB
             return base.ProcessKeyPreview(ref m);
         }
 
+        private void resizeBoardToolStripMenuItem_Click(object sender, EventArgs e)
+        {
+            using var resizeDialog = new ResizeDialog();
+            resizeDialog.BoardWidthMm = layeredCanvas.CanvasWidth * CurrentPrinter.MmPerPixelX;
+            resizeDialog.BoardHeightMm = layeredCanvas.CanvasHeight * CurrentPrinter.MmPerPixelY;
+            if (resizeDialog.ShowDialog() == DialogResult.OK)
+            {
+                layeredCanvas.ResizeCanvas((int)(resizeDialog.BoardWidthMm * CurrentPrinter.PixelsPerMmX), (int)(resizeDialog.BoardHeightMm * CurrentPrinter.PixelsPerMmY));
+            }
+        }
+
+        private void button1_Click(object sender, EventArgs e)
+        {
+            panel1.ScrollControlIntoView(panel2);
+        }
     }
 }

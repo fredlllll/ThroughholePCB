@@ -10,7 +10,7 @@ namespace ThroughholePCB
     public class CanvasLayer : IDisposable
     {
         public bool Active { get; set; } = false;
-        public Bitmap Bitmap { get; }
+        public Bitmap Bitmap { get; protected set; }
         public bool Visible { get; set; } = true;
         public string Name { get; set; }
         public Color LayerColor { get; set; }
@@ -20,6 +20,16 @@ namespace ThroughholePCB
             Bitmap = bitmap;
             Name = name;
             LayerColor = layerColor;
+        }
+
+        public void Resize(int width, int height)
+        {
+            var oldBmp = Bitmap;
+            Bitmap = ImageUtil.CreateImageCleared(width, height, PixelFormat.Format32bppArgb, Color.Transparent);
+            using var g = Graphics.FromImage(Bitmap);
+            g.DrawImageUnscaled(oldBmp, 0, 0);
+            g.Flush(System.Drawing.Drawing2D.FlushIntention.Sync);
+            oldBmp.Dispose();
         }
 
         public CanvasLayer(int width, int height, string name, Color layerColor)

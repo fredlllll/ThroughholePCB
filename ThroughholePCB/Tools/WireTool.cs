@@ -8,7 +8,7 @@ using System.Windows.Forms;
 
 namespace ThroughholePCB.Tools
 {
-    public class WireTool : ToolBase
+    public class WireTool : BaseTool
     {
         private bool hasMouseBeenPressed = false;
         private bool erase = false;

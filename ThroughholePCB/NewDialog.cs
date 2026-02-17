@@ -32,8 +32,8 @@ namespace ThroughholePCB
 
         private void LoadDefaults()
         {
-            WidthParameter = defaultWidth;
-            HeightParameter = defaultHeight;
+            BoardWidthMm = defaultWidth;
+            BoardHeightMm = defaultHeight;
             SelectedPrinter = null;
         }
 
@@ -42,8 +42,8 @@ namespace ThroughholePCB
             try
             {
                 //check for parsing errors
-                float w = WidthParameter;
-                float h = HeightParameter;
+                float w = BoardWidthMm;
+                float h = BoardHeightMm;
                 SelectedPrinter = PrinterDatas.AllPrinters[printerDropdown.SelectedIndex];
                 DialogResult = DialogResult.OK;
                 Close();
@@ -61,7 +61,7 @@ namespace ThroughholePCB
             Close();
         }
 
-        public float WidthParameter
+        public float BoardWidthMm
         {
             get
             {
@@ -73,7 +73,7 @@ namespace ThroughholePCB
             }
         }
 
-        public float HeightParameter
+        public float BoardHeightMm
         {
             get
             {

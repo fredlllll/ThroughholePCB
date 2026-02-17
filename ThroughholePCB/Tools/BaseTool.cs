@@ -7,12 +7,12 @@ using System.Threading.Tasks;
 
 namespace ThroughholePCB.Tools
 {
-    public abstract class ToolBase : ITool
+    public abstract class BaseTool : ITool
     {
         protected MainForm mainForm;
         protected ToolStripButton button;
 
-        public ToolBase(MainForm mainForm, ToolStripButton button)
+        public BaseTool(MainForm mainForm, ToolStripButton button)
         {
             this.mainForm = mainForm;
             this.button = button;

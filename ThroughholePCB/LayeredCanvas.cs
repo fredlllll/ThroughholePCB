@@ -90,5 +90,16 @@ namespace ThroughholePCB
             Grid.Draw(e.Graphics, CanvasWidth, CanvasHeight);
             base.OnPaint(e); //just calls the paint event handler
         }
+
+        public void ResizeCanvas(int widthPx, int heightPx)
+        {
+            foreach (var layer in Layers)
+            {
+                layer.Resize(widthPx, heightPx);
+            }
+            Width = widthPx;
+            Height = heightPx;
+            Invalidate();
+        }
     }
 }

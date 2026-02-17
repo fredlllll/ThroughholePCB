@@ -6,7 +6,7 @@ using System.Threading.Tasks;
 
 namespace ThroughholePCB.Tools
 {
-    public class HoleTool : ToolBase
+    public class HoleTool : BaseTool
     {
         public float OuterDiameterMil { get; set; } = 40;
         public float InnerDiameterMil { get; set; } = 20;

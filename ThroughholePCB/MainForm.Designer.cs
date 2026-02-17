@@ -39,6 +39,8 @@
             exportToolStripMenuItem = new ToolStripMenuItem();
             toolStripSeparator3 = new ToolStripSeparator();
             exitToolStripMenuItem = new ToolStripMenuItem();
+            editToolStripMenuItem = new ToolStripMenuItem();
+            resizeBoardToolStripMenuItem = new ToolStripMenuItem();
             toolStrip1 = new ToolStrip();
             toolWireBtn = new ToolStripButton();
             toolHoleBtn = new ToolStripButton();
@@ -50,6 +52,9 @@
             statusStrip1 = new StatusStrip();
             toolStripStatusLabel = new ToolStripStatusLabel();
             panel1 = new Panel();
+            panel2 = new Panel();
+            leftRuler1 = new LeftRuler();
+            topRuler1 = new TopRuler();
             layeredCanvas = new LayeredCanvas();
             propertyGrid = new PropertyGrid();
             splitContainer1 = new SplitContainer();
@@ -69,7 +74,7 @@
             // 
             // menuStrip1
             // 
-            menuStrip1.Items.AddRange(new ToolStripItem[] { fileToolStripMenuItem });
+            menuStrip1.Items.AddRange(new ToolStripItem[] { fileToolStripMenuItem, editToolStripMenuItem });
             menuStrip1.Location = new Point(0, 0);
             menuStrip1.Name = "menuStrip1";
             menuStrip1.Size = new Size(837, 24);
@@ -134,6 +139,20 @@
             exitToolStripMenuItem.Size = new Size(114, 22);
             exitToolStripMenuItem.Text = "Exit";
             exitToolStripMenuItem.Click += ExitToolStripMenuItem_Click;
+            // 
+            // editToolStripMenuItem
+            // 
+            editToolStripMenuItem.DropDownItems.AddRange(new ToolStripItem[] { resizeBoardToolStripMenuItem });
+            editToolStripMenuItem.Name = "editToolStripMenuItem";
+            editToolStripMenuItem.Size = new Size(39, 20);
+            editToolStripMenuItem.Text = "Edit";
+            // 
+            // resizeBoardToolStripMenuItem
+            // 
+            resizeBoardToolStripMenuItem.Name = "resizeBoardToolStripMenuItem";
+            resizeBoardToolStripMenuItem.Size = new Size(140, 22);
+            resizeBoardToolStripMenuItem.Text = "Resize Board";
+            resizeBoardToolStripMenuItem.Click += resizeBoardToolStripMenuItem_Click;
             // 
             // toolStrip1
             // 
@@ -218,6 +237,9 @@
             // panel1
             // 
             panel1.AutoScroll = true;
+            panel1.Controls.Add(panel2);
+            panel1.Controls.Add(leftRuler1);
+            panel1.Controls.Add(topRuler1);
             panel1.Controls.Add(layeredCanvas);
             panel1.Dock = DockStyle.Fill;
             panel1.Location = new Point(0, 0);
@@ -225,9 +247,37 @@
             panel1.Size = new Size(649, 524);
             panel1.TabIndex = 4;
             // 
+            // panel2
+            // 
+            panel2.BackColor = SystemColors.AppWorkspace;
+            panel2.Location = new Point(0, 0);
+            panel2.Name = "panel2";
+            panel2.Size = new Size(20, 20);
+            panel2.TabIndex = 3;
+            // 
+            // leftRuler1
+            // 
+            leftRuler1.BackColor = Color.IndianRed;
+            leftRuler1.Location = new Point(0, 20);
+            leftRuler1.Mode = RulerMode.Mm;
+            leftRuler1.Name = "leftRuler1";
+            leftRuler1.Size = new Size(20, 200);
+            leftRuler1.TabIndex = 2;
+            leftRuler1.Text = "leftRuler1";
+            // 
+            // topRuler1
+            // 
+            topRuler1.BackColor = Color.IndianRed;
+            topRuler1.Location = new Point(20, 0);
+            topRuler1.Mode = RulerMode.Mm;
+            topRuler1.Name = "topRuler1";
+            topRuler1.Size = new Size(200, 20);
+            topRuler1.TabIndex = 1;
+            topRuler1.Text = "topRuler1";
+            // 
             // layeredCanvas
             // 
-            layeredCanvas.Location = new Point(0, 0);
+            layeredCanvas.Location = new Point(20, 20);
             layeredCanvas.Name = "layeredCanvas";
             layeredCanvas.Size = new Size(200, 200);
             layeredCanvas.TabIndex = 0;
@@ -332,5 +382,10 @@
         private ToolStripComboBox toolActiveLayer;
         private ToolStripSeparator toolStripSeparator4;
         private ToolStripButton toolFreeLine;
+        private TopRuler topRuler1;
+        private LeftRuler leftRuler1;
+        private ToolStripMenuItem editToolStripMenuItem;
+        private ToolStripMenuItem resizeBoardToolStripMenuItem;
+        private Panel panel2;
     }
 }
