@@ -13,7 +13,7 @@ namespace ThroughholePCB.Persistence
     {
         public const int currentVersion = 1;
 
-        public Dictionary<string, Image> Layers { get; set; } = new Dictionary<string, Image>();
+        public IEnumerable<CanvasLayer> Layers { get; set; } = new List<CanvasLayer>();
         public PrinterData PrinterData { get; set; } = null!;
 
         class ExtraInfo
@@ -28,7 +28,18 @@ namespace ThroughholePCB.Persistence
             public float PrinterDisplayWidthMm { get; set; }
             public float PrinterDisplayHeightMm { get; set; }
 
-            public string[] LayerNames { get; set; } = Array.Empty<string>();
+            public int CanvasWidth { get; set; }
+            public int CanvasHeight { get; set; }
+
+            public List<ExtraLayerInfo> LayerInfos { get; set; } = new();
+            //public string[] LayerNames { get; set; } = Array.Empty<string>();
+            //public Dictionary<string, Color> LayerColors { get; set; } = new Dictionary<string, Color>();
+        }
+
+        class ExtraLayerInfo
+        {
+            public string Name { get; set; } = string.Empty;
+            public string Color { get; set; } = string.Empty;
         }
 
         public void WriteTo(string filePath)
@@ -41,13 +52,20 @@ namespace ThroughholePCB.Persistence
         {
             using var zip = new ZipArchive(stream, ZipArchiveMode.Create, true);
 
-            foreach (var kv in Layers)
+            List<ExtraLayerInfo> layerInfos = new List<ExtraLayerInfo>();
+            foreach (var l in Layers)
             {
-                var layerEntry = zip.CreateEntry(kv.Key + ".png", CompressionLevel.NoCompression);
+                var layerEntry = zip.CreateEntry(l.Name + ".png", CompressionLevel.NoCompression);
                 using (var layerStream = layerEntry.Open())
                 {
-                    kv.Value.Save(layerStream, System.Drawing.Imaging.ImageFormat.Png);
+                    l.Bitmap.Save(layerStream, System.Drawing.Imaging.ImageFormat.Png);
                 }
+                var li = new ExtraLayerInfo()
+                {
+                    Name = l.Name,
+                    Color = l.LayerColor.ToArgb().ToString("X4")
+                };
+                layerInfos.Add(li);
             }
 
             var extraInfo = new ExtraInfo()
@@ -58,7 +76,9 @@ namespace ThroughholePCB.Persistence
                 PrinterDisplayHeightPx = PrinterData.DisplayHeightPx,
                 PrinterDisplayWidthMm = PrinterData.DisplayWidthMm,
                 PrinterDisplayHeightMm = PrinterData.DisplayHeightMm,
-                LayerNames = Layers.Keys.ToArray(),
+                CanvasWidth = Layers.First().Bitmap.Width,
+                CanvasHeight = Layers.First().Bitmap.Height,
+                LayerInfos = layerInfos,
             };
             var opt = new JsonSerializerOptions()
             {
@@ -106,15 +126,20 @@ namespace ThroughholePCB.Persistence
                 DisplayHeightMm = extraInfo.PrinterDisplayHeightMm,
             };
 
-            Layers = new Dictionary<string, Image>();
-            foreach (var layerName in extraInfo.LayerNames)
+            var layers = new List<CanvasLayer>();
+            foreach (var layerInfo in extraInfo.LayerInfos)
             {
-                var layerEntry = zip.GetEntry(layerName + ".png") ?? throw new InvalidDataException();
+                var layerEntry = zip.GetEntry(layerInfo.Name + ".png") ?? throw new InvalidDataException();
+                Bitmap bmp;
                 using (var layerStream = layerEntry.Open())
                 {
-                    Layers[layerName] = new Bitmap(layerStream);
+                    bmp = new Bitmap(layerStream);
                 }
+                var color = Color.FromArgb(int.Parse(layerInfo.Color, System.Globalization.NumberStyles.HexNumber));
+                var cl = new CanvasLayer(bmp, layerInfo.Name, color);
+                layers.Add(cl);
             }
+            Layers = layers;
         }
     }
 }

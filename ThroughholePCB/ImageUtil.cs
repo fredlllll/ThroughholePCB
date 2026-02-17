@@ -60,7 +60,7 @@ namespace ThroughholePCB
                     uint* srcEnd = src + numPixels;
                     while (src < srcEnd)
                     {
-                        if (*src == blackPixel)
+                        if ((*src&0xFFFFFF) == 0)
                         {
                             *dst = blackPixel;
                         }

@@ -24,30 +24,30 @@ namespace ThroughholePCB.Tools
             mainForm.SetTool(this);
         }
 
-        protected Point GetImagePos(Point pictureBoxPos, bool useGrid = true)
+        protected float MilToPixels(float mil)
         {
-            return ToolUtils.GetImagePos(mainForm.workareaPictureBox, pictureBoxPos, useGrid ? mainForm.Grid : null);
+            return mil / 1000 * mainForm.CurrentPrinter.PixelsPerMmX * 25.4f;
         }
 
-        protected Point GetPictureBoxPos(Point imagePos, bool useGrid = false)
+        protected float PixelsToMil(float pixels)
         {
-            return ToolUtils.GetPictureBoxPos(mainForm.workareaPictureBox, imagePos, useGrid ? mainForm.Grid : null);
+            return (pixels / 25.4f / mainForm.CurrentPrinter.PixelsPerMmX) * 1000;
         }
 
         public virtual void Enable()
         {
-            mainForm.workareaPictureBox.MouseDown += WorkareaPictureBox_MouseDown;
-            mainForm.workareaPictureBox.MouseUp += WorkareaPictureBox_MouseUp;
-            mainForm.workareaPictureBox.MouseMove += WorkareaPictureBox_MouseMove;
-            mainForm.workareaPictureBox.Paint += WorkareaPictureBox_Paint;
+            mainForm.layeredCanvas.MouseDown += WorkareaPictureBox_MouseDown;
+            mainForm.layeredCanvas.MouseUp += WorkareaPictureBox_MouseUp;
+            mainForm.layeredCanvas.MouseMove += WorkareaPictureBox_MouseMove;
+            mainForm.layeredCanvas.Paint += WorkareaPictureBox_Paint;
         }
 
         public virtual void Disable()
         {
-            mainForm.workareaPictureBox.MouseDown -= WorkareaPictureBox_MouseDown;
-            mainForm.workareaPictureBox.MouseUp -= WorkareaPictureBox_MouseUp;
-            mainForm.workareaPictureBox.MouseMove -= WorkareaPictureBox_MouseMove;
-            mainForm.workareaPictureBox.Paint -= WorkareaPictureBox_Paint;
+            mainForm.layeredCanvas.MouseDown -= WorkareaPictureBox_MouseDown;
+            mainForm.layeredCanvas.MouseUp -= WorkareaPictureBox_MouseUp;
+            mainForm.layeredCanvas.MouseMove -= WorkareaPictureBox_MouseMove;
+            mainForm.layeredCanvas.Paint -= WorkareaPictureBox_Paint;
         }
         protected virtual void WorkareaPictureBox_MouseDown(object? sender, MouseEventArgs e)
         {

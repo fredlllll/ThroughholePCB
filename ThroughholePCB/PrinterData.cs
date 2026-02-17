@@ -48,5 +48,15 @@ namespace ThroughholePCB
                 return DisplayHeightMm / DisplayHeightPx;
             }
         }
+
+        public int GetWidthPx(float mm)
+        {
+            return (int)(PixelsPerMmX* mm);
+        }
+
+        public int GetHeightPx(float mm)
+        {
+            return (int)(PixelsPerMmY * mm);
+        }
     }
 }

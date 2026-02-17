@@ -9,35 +9,41 @@ namespace ThroughholePCB
 {
     public class Grid
     {
-        public float Spacing { get; set; } = 100f;
+        /// <summary>
+        /// Spacing in PIXELS, not mils
+        /// </summary>
+        public float SpacingX { get; set; } = 100f;
+        public float SpacingY { get; set; } = 100f;
         public bool Enabled { get; set; } = true;
 
-        private readonly PictureBox pictureBox;
+        private readonly Control canvas;
         private Point mousePosRaw;
 
-        public Grid(PictureBox pictureBox)
+        public Grid(Control canvas)
         {
-            this.pictureBox = pictureBox;
-            pictureBox.Paint += PictureBox_Paint;
-            pictureBox.MouseMove += PictureBox_MouseMove;
+            this.canvas = canvas;
+            canvas.MouseMove += Canvas_MouseMove;
         }
 
-        private void PictureBox_MouseMove(object? sender, MouseEventArgs e)
+        private void Canvas_MouseMove(object? sender, MouseEventArgs e)
         {
             mousePosRaw = e.Location;
-            pictureBox.Invalidate();
+            canvas.Invalidate();
         }
 
-        private void PictureBox_Paint(object? sender, PaintEventArgs e)
+        public void Draw(Graphics g, float width, float height)
         {
-            if (Enabled)
-            {
-                // get aligned position and then convert it to picture box coordinates for drawing
-                var pos = ToolUtils.GetImagePos(pictureBox, mousePosRaw, this);
-                pos = ToolUtils.GetPictureBoxPos(pictureBox, pos);
-                e.Graphics.DrawLine(Pens.Red, pos.X - 5, pos.Y, pos.X + 5, pos.Y);
-                e.Graphics.DrawLine(Pens.Red, pos.X, pos.Y - 5, pos.X, pos.Y + 5);
-            }
+            //grid lines
+            using var pen = new Pen(Color.FromArgb(40, Color.White));
+            for (float x = 0; x < width; x += SpacingX)
+                g.DrawLine(pen, x, 0, x, height);
+            for (float y = 0; y < height; y += SpacingY)
+                g.DrawLine(pen, 0, y, width, y);
+
+            //red cross
+            var pos = GetAligned(mousePosRaw);
+            g.DrawLine(Pens.Red, pos.X - 5, pos.Y, pos.X + 5, pos.Y);
+            g.DrawLine(Pens.Red, pos.X, pos.Y - 5, pos.X, pos.Y + 5);
         }
 
         public Point GetAligned(Point pos)
@@ -48,8 +54,8 @@ namespace ThroughholePCB
             }
 
             //get the nearest grid point to pos
-            float nearestX = MathF.Round(pos.X / Spacing) * Spacing;
-            float nearestY = MathF.Round(pos.Y / Spacing) * Spacing;
+            float nearestX = MathF.Round(pos.X / SpacingX) * SpacingX;
+            float nearestY = MathF.Round(pos.Y / SpacingY) * SpacingY;
 
             return new Point((int)nearestX, (int)nearestY);
         }

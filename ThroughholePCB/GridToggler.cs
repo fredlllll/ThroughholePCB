@@ -8,63 +8,37 @@ namespace ThroughholePCB
 {
     public class GridToggler
     {
-        private bool keyDown = false;
-
-        private Form form;
         private ToolStripButton toolStripButton;
         private Grid grid;
-        private Keys keyCode;
+        private bool keyDown = false;
 
-        public GridToggler(Form mainForm, ToolStripButton toolStripButton, Grid grid, Keys keyCode)
+        public GridToggler(ToolStripButton toolStripButton, Grid grid)
         {
-            this.form = mainForm;
             this.toolStripButton = toolStripButton;
             this.grid = grid;
-            this.keyCode = keyCode;
-
-            mainForm.PreviewKeyDown += MainForm_PreviewKeyDown;
-            mainForm.KeyUp += MainForm_KeyUp;
-            mainForm.LostFocus += MainForm_LostFocus;
         }
 
-        private void Up()
+        public void ToggleGrid()
+        {
+            grid.Enabled = !grid.Enabled;
+            toolStripButton.Checked = grid.Enabled;
+        }
+
+        public void KeyUp()
         {
             if (keyDown)
             {
                 keyDown = false;
-                grid.Enabled = !grid.Enabled;
-                toolStripButton.Checked = grid.Enabled;
+                ToggleGrid();
             }
         }
 
-        private void Down()
+        public void KeyDown()
         {
             if (!keyDown)
             {
                 keyDown = true;
-                grid.Enabled = !grid.Enabled;
-                toolStripButton.Checked = grid.Enabled;
-            }
-        }
-
-        private void MainForm_LostFocus(object? sender, EventArgs e)
-        {
-            Up();
-        }
-
-        private void MainForm_KeyUp(object? sender, KeyEventArgs e)
-        {
-            if (e.KeyCode == keyCode)
-            {
-                Up();
-            }
-        }
-
-        private void MainForm_PreviewKeyDown(object? sender, PreviewKeyDownEventArgs e)
-        {
-            if (e.KeyCode == keyCode)
-            {
-                Down();
+                ToggleGrid();
             }
         }
     }

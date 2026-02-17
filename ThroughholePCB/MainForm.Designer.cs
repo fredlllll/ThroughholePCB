@@ -42,18 +42,20 @@
             toolStrip1 = new ToolStrip();
             toolWireBtn = new ToolStripButton();
             toolHoleBtn = new ToolStripButton();
+            toolFreeLine = new ToolStripButton();
             toolStripSeparator2 = new ToolStripSeparator();
             toolGridBtn = new ToolStripButton();
-            workareaPictureBox = new PictureBox();
+            toolStripSeparator4 = new ToolStripSeparator();
+            toolActiveLayer = new ToolStripComboBox();
             statusStrip1 = new StatusStrip();
             toolStripStatusLabel = new ToolStripStatusLabel();
             panel1 = new Panel();
+            layeredCanvas = new LayeredCanvas();
             propertyGrid = new PropertyGrid();
             splitContainer1 = new SplitContainer();
             splitContainer2 = new SplitContainer();
             menuStrip1.SuspendLayout();
             toolStrip1.SuspendLayout();
-            ((System.ComponentModel.ISupportInitialize)workareaPictureBox).BeginInit();
             statusStrip1.SuspendLayout();
             panel1.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)splitContainer1).BeginInit();
@@ -136,7 +138,7 @@
             // toolStrip1
             // 
             toolStrip1.ImageScalingSize = new Size(24, 24);
-            toolStrip1.Items.AddRange(new ToolStripItem[] { toolWireBtn, toolHoleBtn, toolStripSeparator2, toolGridBtn });
+            toolStrip1.Items.AddRange(new ToolStripItem[] { toolWireBtn, toolHoleBtn, toolFreeLine, toolStripSeparator2, toolGridBtn, toolStripSeparator4, toolActiveLayer });
             toolStrip1.Location = new Point(0, 24);
             toolStrip1.Name = "toolStrip1";
             toolStrip1.Size = new Size(837, 31);
@@ -161,6 +163,15 @@
             toolHoleBtn.Size = new Size(28, 28);
             toolHoleBtn.Text = "Hole Tool";
             // 
+            // toolFreeLine
+            // 
+            toolFreeLine.DisplayStyle = ToolStripItemDisplayStyle.Image;
+            toolFreeLine.Image = (Image)resources.GetObject("toolFreeLine.Image");
+            toolFreeLine.ImageTransparentColor = Color.Magenta;
+            toolFreeLine.Name = "toolFreeLine";
+            toolFreeLine.Size = new Size(28, 28);
+            toolFreeLine.Text = "toolStripButton1";
+            // 
             // toolStripSeparator2
             // 
             toolStripSeparator2.Name = "toolStripSeparator2";
@@ -178,14 +189,17 @@
             toolGridBtn.Text = "Grid On/Off";
             toolGridBtn.Click += ToolGridBtn_Click;
             // 
-            // workareaPictureBox
+            // toolStripSeparator4
             // 
-            workareaPictureBox.BackColor = SystemColors.ControlDarkDark;
-            workareaPictureBox.Location = new Point(0, 0);
-            workareaPictureBox.Name = "workareaPictureBox";
-            workareaPictureBox.Size = new Size(256, 256);
-            workareaPictureBox.TabIndex = 2;
-            workareaPictureBox.TabStop = false;
+            toolStripSeparator4.Name = "toolStripSeparator4";
+            toolStripSeparator4.Size = new Size(6, 31);
+            // 
+            // toolActiveLayer
+            // 
+            toolActiveLayer.DropDownWidth = 250;
+            toolActiveLayer.Name = "toolActiveLayer";
+            toolActiveLayer.Size = new Size(121, 31);
+            toolActiveLayer.SelectedIndexChanged += ToolActiveLayer_SelectedIndexChanged;
             // 
             // statusStrip1
             // 
@@ -204,19 +218,29 @@
             // panel1
             // 
             panel1.AutoScroll = true;
-            panel1.Controls.Add(workareaPictureBox);
+            panel1.Controls.Add(layeredCanvas);
             panel1.Dock = DockStyle.Fill;
             panel1.Location = new Point(0, 0);
             panel1.Name = "panel1";
             panel1.Size = new Size(649, 524);
             panel1.TabIndex = 4;
             // 
+            // layeredCanvas
+            // 
+            layeredCanvas.Location = new Point(0, 0);
+            layeredCanvas.Name = "layeredCanvas";
+            layeredCanvas.Size = new Size(200, 200);
+            layeredCanvas.TabIndex = 0;
+            layeredCanvas.TabStop = false;
+            layeredCanvas.Text = "layeredCanvas";
+            // 
             // propertyGrid
             // 
             propertyGrid.Dock = DockStyle.Fill;
+            propertyGrid.HelpVisible = false;
             propertyGrid.Location = new Point(0, 0);
             propertyGrid.Name = "propertyGrid";
-            propertyGrid.Size = new Size(184, 262);
+            propertyGrid.Size = new Size(184, 150);
             propertyGrid.TabIndex = 5;
             // 
             // splitContainer1
@@ -247,7 +271,7 @@
             // 
             splitContainer2.Panel1.Controls.Add(propertyGrid);
             splitContainer2.Size = new Size(184, 524);
-            splitContainer2.SplitterDistance = 262;
+            splitContainer2.SplitterDistance = 150;
             splitContainer2.TabIndex = 6;
             // 
             // MainForm
@@ -267,7 +291,6 @@
             menuStrip1.PerformLayout();
             toolStrip1.ResumeLayout(false);
             toolStrip1.PerformLayout();
-            ((System.ComponentModel.ISupportInitialize)workareaPictureBox).EndInit();
             statusStrip1.ResumeLayout(false);
             statusStrip1.PerformLayout();
             panel1.ResumeLayout(false);
@@ -298,7 +321,6 @@
         private ToolStripMenuItem exitToolStripMenuItem;
         private StatusStrip statusStrip1;
         private ToolStripStatusLabel toolStripStatusLabel;
-        public PictureBox workareaPictureBox;
         private ToolStripSeparator toolStripSeparator2;
         private Panel panel1;
         private ToolStripMenuItem exportToolStripMenuItem;
@@ -306,5 +328,9 @@
         private PropertyGrid propertyGrid;
         private SplitContainer splitContainer1;
         private SplitContainer splitContainer2;
+        public LayeredCanvas layeredCanvas;
+        private ToolStripComboBox toolActiveLayer;
+        private ToolStripSeparator toolStripSeparator4;
+        private ToolStripButton toolFreeLine;
     }
 }

@@ -8,8 +8,8 @@ namespace ThroughholePCB.Tools
 {
     public class HoleTool : ToolBase
     {
-        public float OuterRadius { get; set; } = 50;
-        public float InnerRadius { get; set; } = 20;
+        public float OuterDiameterMil { get; set; } = 40;
+        public float InnerDiameterMil { get; set; } = 20;
         private SolidBrush holeBrush = new SolidBrush(Color.White);
 
         public Color HoleColor
@@ -23,20 +23,29 @@ namespace ThroughholePCB.Tools
         }
         protected override void WorkareaPictureBox_MouseDown(object? sender, MouseEventArgs e)
         {
-            var pos = GetImagePos(e.Location);
-            var g = mainForm.CurrentGraphics;
-            var halfOuter = OuterRadius / 2;
-            var halfInner = InnerRadius / 2;
-            if (e.Button == MouseButtons.Left)
+            if (mainForm.layeredCanvas.ActiveLayer != null)
             {
-                g.FillEllipse(holeBrush, pos.X - halfOuter, pos.Y - halfOuter, OuterRadius, OuterRadius);
-                g.FillEllipse(Brushes.Black, pos.X - halfInner, pos.Y - halfInner, InnerRadius, InnerRadius);
+                var pos = mainForm.layeredCanvas.Grid.GetAligned(e.Location);
+                using var g = mainForm.layeredCanvas.ActiveLayer.CreateGraphics();
+
+                var outerDiameterPx = MilToPixels(OuterDiameterMil);
+                var innerDiameterPx = MilToPixels(InnerDiameterMil);
+
+                var halfOuter = outerDiameterPx / 2;
+                var halfInner = innerDiameterPx / 2;
+                if (e.Button == MouseButtons.Left)
+                {
+                    g.FillEllipse(holeBrush, pos.X - halfOuter, pos.Y - halfOuter, outerDiameterPx, outerDiameterPx);
+                    g.CompositingMode = System.Drawing.Drawing2D.CompositingMode.SourceCopy;
+                    g.FillEllipse(Brushes.Transparent, pos.X - halfInner, pos.Y - halfInner, innerDiameterPx, innerDiameterPx);
+                }
+                else if (e.Button == MouseButtons.Right)
+                {
+                    g.CompositingMode = System.Drawing.Drawing2D.CompositingMode.SourceCopy;
+                    g.FillEllipse(Brushes.Transparent, pos.X - halfOuter, pos.Y - halfOuter, outerDiameterPx, outerDiameterPx);
+                }
+                mainForm.layeredCanvas.Invalidate();
             }
-            else if (e.Button == MouseButtons.Right)
-            {
-                g.FillEllipse(Brushes.Black, pos.X - halfOuter, pos.Y - halfOuter, OuterRadius, OuterRadius);
-            }
-            mainForm.workareaPictureBox.Invalidate();
         }
     }
 }

@@ -8,14 +8,15 @@ using System.Windows.Forms;
 
 namespace ThroughholePCB.Tools
 {
-    public class WireTool : ToolBase
+    public class FreeLineTool : ToolBase
     {
         private bool hasMouseBeenPressed = false;
         private bool erase = false;
-        private Point startPos, endPos;
+        private Point lastPos;
         private Pen pen;
+        //private SolidBrush lineBrush = new SolidBrush(Color.White);
 
-        public float WireWidthMil
+        public float LineWidthMil
         {
             get
             {
@@ -27,7 +28,7 @@ namespace ThroughholePCB.Tools
             }
         }
 
-        public Color WireShade
+        public Color LineShade
         {
             get
             {
@@ -39,25 +40,34 @@ namespace ThroughholePCB.Tools
             }
         }
 
-        public WireTool(MainForm mainForm, ToolStripButton button) : base(mainForm, button)
+        public FreeLineTool(MainForm mainForm, ToolStripButton button) : base(mainForm, button)
         {
             pen = new Pen(new SolidBrush(Color.White), 1);
-        }
-
-        protected override void WorkareaPictureBox_Paint(object? sender, PaintEventArgs e)
-        {
-            if (hasMouseBeenPressed)
-            {
-                DrawingUtil.PaintLine(e.Graphics, pen, mainForm.layeredCanvas.Grid.GetAligned(startPos), mainForm.layeredCanvas.Grid.GetAligned(endPos));
-            }
         }
 
         protected override void WorkareaPictureBox_MouseMove(object? sender, MouseEventArgs e)
         {
             if (hasMouseBeenPressed)
             {
-                endPos = mainForm.layeredCanvas.Grid.GetAligned(e.Location);
-                mainForm.layeredCanvas.Invalidate();
+                if (mainForm.layeredCanvas.ActiveLayer != null)
+                {
+                    var currentPos = mainForm.layeredCanvas.Grid.GetAligned(e.Location);
+                    using var g = mainForm.layeredCanvas.ActiveLayer.CreateGraphics();
+                    if (erase)
+                    {
+                        g.CompositingMode = CompositingMode.SourceCopy;
+                        var col = pen.Color;
+                        pen.Color = Color.Transparent;
+                        DrawingUtil.PaintLine(g, pen, lastPos, currentPos);
+                        pen.Color = col;
+                    }
+                    else
+                    {
+                        DrawingUtil.PaintLine(g, pen, lastPos, currentPos);
+                    }
+                    lastPos = currentPos;
+                    mainForm.layeredCanvas.Invalidate();
+                }
             }
         }
 
@@ -66,25 +76,6 @@ namespace ThroughholePCB.Tools
             if (hasMouseBeenPressed)
             {
                 hasMouseBeenPressed = false;
-                if (mainForm.layeredCanvas.ActiveLayer != null)
-                {
-                    endPos = mainForm.layeredCanvas.Grid.GetAligned(e.Location);
-                    using var g = mainForm.layeredCanvas.ActiveLayer.CreateGraphics();
-                    if (erase)
-                    {
-                        g.CompositingMode = CompositingMode.SourceCopy;
-                        var col = pen.Color;
-                        pen.Color = Color.Transparent;
-                        DrawingUtil.PaintLine(g, pen, startPos, endPos);
-                        pen.Color = col;
-                    }
-                    else
-                    {
-                        DrawingUtil.PaintLine(g, pen, startPos, endPos);
-                    }
-
-                    mainForm.layeredCanvas.Invalidate();
-                }
             }
         }
 
@@ -93,10 +84,22 @@ namespace ThroughholePCB.Tools
             if (!hasMouseBeenPressed && (e.Button == MouseButtons.Left || e.Button == MouseButtons.Right))
             {
                 hasMouseBeenPressed = true;
-                erase = e.Button == MouseButtons.Right;
+                if (mainForm.layeredCanvas.ActiveLayer != null)
+                {
+                    erase = e.Button == MouseButtons.Right;
 
-                endPos = startPos = mainForm.layeredCanvas.Grid.GetAligned(e.Location);
-                mainForm.layeredCanvas.Invalidate();
+                    lastPos = mainForm.layeredCanvas.Grid.GetAligned(e.Location);
+                    using var g = mainForm.layeredCanvas.ActiveLayer.CreateGraphics();
+                    var widthPx = MilToPixels(LineWidthMil);
+                    var brush = pen.Brush;
+                    if (erase)
+                    {
+                        g.CompositingMode = CompositingMode.SourceCopy;
+                        brush = Brushes.Transparent;
+                    }
+                    g.FillEllipse(brush, lastPos.X - widthPx / 2, lastPos.Y - widthPx / 2, widthPx, widthPx);
+                    mainForm.layeredCanvas.Invalidate();
+                }
             }
         }
     }

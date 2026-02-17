@@ -18,29 +18,34 @@ namespace ThroughholePCB
         private ITool currentTool;
         private WireTool wireTool;
         private HoleTool holeTool;
+        private FreeLineTool freeLineTool;
 
         private GridToggler gridToggler;
-        public Grid Grid { get; }
 
-        public Graphics CurrentGraphics { get; private set; }
         public PrinterData CurrentPrinter { get; private set; }
 
         public MainForm()
         {
             InitializeComponent();
 
-            Grid = new Grid(workareaPictureBox);
-            gridToggler = new GridToggler(this, toolGridBtn, Grid, Keys.ControlKey);
+            gridToggler = new GridToggler(toolGridBtn, layeredCanvas.Grid);
 
             //initialize tools
             wireTool = new WireTool(this, toolWireBtn);
             holeTool = new HoleTool(this, toolHoleBtn);
+            freeLineTool = new FreeLineTool(this, toolFreeLine);
 
-            //set wire tool as default
-            SetTool(wireTool);
+            //populate layer dropdown;
+            foreach (var n in LayerInfos.AllLayerInfos)
+            {
+                toolActiveLayer.Items.Add(n);
+            }
 
             //initialize application
             New(50, 50, PrinterDatas.DefaultPrinter);
+
+            //set wire tool as default
+            SetTool(wireTool);
 
             FormClosing += MainForm_FormClosing;
         }
@@ -88,18 +93,24 @@ namespace ThroughholePCB
             }
         }
 
-        [MemberNotNull(nameof(CurrentGraphics), nameof(CurrentPrinter))]
+        [MemberNotNull(nameof(CurrentPrinter))]
         private void New(float widthMm, float heightMm, PrinterData printerData)
         {
-            var widthPx = (int)(printerData.PixelsPerMmX * widthMm);
-            var heightPx = (int)(printerData.PixelsPerMmY * heightMm);
+            var widthPx = printerData.GetWidthPx(widthMm);
+            var heightPx = printerData.GetHeightPx(heightMm);
 
-            var layers = new Dictionary<string, Image>()
+            List<CanvasLayer> layers = new();
+            foreach (var info in LayerInfos.AllLayerInfos)
             {
-                {LayerNames.CopperTopLayer,ImageUtil.CreateImageCleared(widthPx,heightPx,PixelFormat.Format32bppArgb,Color.Black) }
-            };
+                layers.Add(new CanvasLayer(widthPx, heightPx, info.Name, info.Color));
+            }
 
             LoadData(layers, printerData);
+
+            wireTool.WireWidthMil = 50;
+            holeTool.OuterDiameterMil = 80;
+            holeTool.InnerDiameterMil = 40;
+            freeLineTool.LineWidthMil = 3;
 
             currentFileName = null;
         }
@@ -118,18 +129,30 @@ namespace ThroughholePCB
             }
         }
 
-        [MemberNotNull(nameof(CurrentGraphics), nameof(CurrentPrinter))]
-        private void LoadData(Dictionary<string, Image> layers, PrinterData printerData)
+        [MemberNotNull(nameof(CurrentPrinter))]
+        private void LoadData(IEnumerable<CanvasLayer> layers, PrinterData printerData)
         {
-            CurrentGraphics?.Dispose(); //will be null on initial load
-            var img = layers[LayerNames.CopperTopLayer];
-            CurrentGraphics = Graphics.FromImage(img);
-            CurrentPrinter = printerData;
-            workareaPictureBox.Image = img;
-            workareaPictureBox.Width = img.Width;
-            workareaPictureBox.Height = img.Height;
+            layeredCanvas.ClearLayers();
 
-            toolStripStatusLabel.Text = $"{printerData.Name} {img.Width}x{img.Height}";
+            //load new Layers
+            int width = 0, height = 0;
+            foreach (var l in layers)
+            {
+                layeredCanvas.AddLayer(l);
+                width = l.Bitmap.Width;
+                height = l.Bitmap.Height;
+            }
+            layeredCanvas.MakeLayerActive(LayerInfos.CopperTopLayer.Name);
+            toolActiveLayer.SelectedItem = LayerInfos.CopperTopLayer;
+
+            layeredCanvas.Size = new Size(width, height);
+
+            CurrentPrinter = printerData;
+
+            layeredCanvas.Grid.SpacingX = printerData.PixelsPerMmX * 2.54f;
+            layeredCanvas.Grid.SpacingY = printerData.PixelsPerMmY * 2.54f;
+
+            toolStripStatusLabel.Text = $"{printerData.Name} {width}x{height}";
         }
 
         private void Save()
@@ -141,8 +164,15 @@ namespace ThroughholePCB
 
             var file = new ThpcbFile();
             file.PrinterData = CurrentPrinter;
-            file.Layers[LayerNames.CopperTopLayer] = workareaPictureBox.Image;
-            file.WriteTo(currentFileName);
+            file.Layers = layeredCanvas.Layers;
+            try
+            {
+                file.WriteTo(currentFileName);
+            }
+            catch (System.IO.IOException e)
+            {
+                MessageBox.Show("Error Saving file: " + e.Message);
+            }
         }
         private void saveToolStripMenuItem_Click(object sender, EventArgs e)
         {
@@ -169,7 +199,7 @@ namespace ThroughholePCB
 
         private void ToolGridBtn_Click(object sender, EventArgs e)
         {
-            toolGridBtn.Checked = Grid.Enabled = !Grid.Enabled;
+            toolGridBtn.Checked = layeredCanvas.Grid.Enabled = !layeredCanvas.Grid.Enabled;
         }
 
         private void OpenToolStripMenuItem_Click(object sender, EventArgs e)
@@ -195,23 +225,104 @@ namespace ThroughholePCB
 
         private void ExportToolStripMenuItem_Click(object sender, EventArgs e)
         {
-            //TODO: this is just a crutch for exporting to my printers format. actually determine format by printer type in the future
-            var src = ImageUtil.CreateMask((Bitmap)workareaPictureBox.Image);
-            using var tmpImage = ImageUtil.CreateImageCleared(CurrentPrinter.DisplayWidthPx, CurrentPrinter.DisplayHeightPx, PixelFormat.Format32bppArgb, Color.Black);
-            using var g = Graphics.FromImage(tmpImage);
-            g.DrawImage(src, src.Width, 0, -src.Width, src.Height);
-            g.Flush(System.Drawing.Drawing2D.FlushIntention.Sync);
+            var folderName = Path.Combine(Path.GetDirectoryName(currentFileName), Path.GetFileNameWithoutExtension(currentFileName));
+            Directory.CreateDirectory(folderName);
+            Console.WriteLine(folderName);
 
-            var imageName = Path.ChangeExtension(currentFileName, ".png");
+            string[] mirroredLayers = [LayerInfos.CopperTopLayer.Name, LayerInfos.SilkScreenTop.Name];
 
-            tmpImage.Save(imageName);
+            int w = CurrentPrinter.DisplayWidthPx;
+            int h = CurrentPrinter.DisplayHeightPx;
+            List<string> imagesToConvert = new();
+            using var printerScreen = new Bitmap(w, h, PixelFormat.Format32bppArgb);
+            using var g = Graphics.FromImage(printerScreen);
+            foreach (var layer in layeredCanvas.Layers)
+            {
+                g.Clear(Color.Black);
+                using var mask = ImageUtil.CreateMask(layer.Bitmap);
+                if (mirroredLayers.Contains(layer.Name))
+                {
+                    g.DrawImage(mask, mask.Width, 0, -mask.Width, mask.Height); //flip image for exposure
+                }
+                else
+                {
+                    g.DrawImage(mask, 0, 0, mask.Width, mask.Height);
+                }
+                g.Flush(System.Drawing.Drawing2D.FlushIntention.Sync);
 
-            var psi = new ProcessStartInfo();
-            psi.FileName = Path.GetFullPath("ImageToPrinter\\ImageToPrinter.exe");
-            psi.ArgumentList.Add(imageName);
-            using var p = Process.Start(psi);
-            p.WaitForExit();
-            //File.Delete(imageName);
+                var imageName = Path.Combine(folderName, layer.Name + ".png");
+                printerScreen.Save(imageName);
+                imagesToConvert.Add(imageName);
+            }
+
+            //alignment masks
+            {
+                using var alignmentMask = new Bitmap(layeredCanvas.CanvasWidth, layeredCanvas.CanvasHeight, PixelFormat.Format32bppArgb);
+                using var ag = Graphics.FromImage(alignmentMask);
+                ag.FillEllipse(Brushes.White, 8, 8, 4, 4);
+                ag.FillEllipse(Brushes.White, alignmentMask.Width - 8, 8, 4, 4);
+                ag.FillEllipse(Brushes.White, alignmentMask.Width - 8, alignmentMask.Height - 8, 4, 4);
+                ag.FillEllipse(Brushes.White, 8, alignmentMask.Height - 8, 4, 4);
+
+                g.Clear(Color.Black);
+                g.DrawImage(alignmentMask, 0, 0, alignmentMask.Width, alignmentMask.Height);
+                g.Flush(System.Drawing.Drawing2D.FlushIntention.Sync);
+                var imageName = Path.Combine(folderName, "alignment.png");
+                printerScreen.Save(imageName);
+                imagesToConvert.Add(imageName);
+                //dont have to flip cause its symmetrical. might need something more advanced if this proves error prone
+            }
+
+            //TODO: this is just a crutch for converting to my printers format. actually determine format by printer type in the future
+            List<Process> processes = new();
+            foreach (var img in imagesToConvert)
+            {
+                var psi = new ProcessStartInfo();
+                psi.FileName = Path.GetFullPath("ImageToPrinter\\ImageToPrinter.exe");
+                psi.ArgumentList.Add(img);
+                var p = Process.Start(psi) ?? throw new Exception("no process");
+                processes.Add(p);
+            }
+            foreach (var p in processes)
+            {
+                p.WaitForExit();
+                p.Dispose();
+            }
         }
+
+        private void ToolActiveLayer_SelectedIndexChanged(object sender, EventArgs e)
+        {
+            var info = (LayerInfo?)toolActiveLayer.SelectedItem;
+            if (info != null)
+            {
+                layeredCanvas.MakeLayerActive(info.Name);
+                layeredCanvas.Invalidate();
+            }
+        }
+
+        protected override bool ProcessCmdKey(ref Message msg, Keys keyData)
+        {
+            if (keyData == Keys.ControlKey || (keyData & Keys.Control) == Keys.Control)
+            {
+                gridToggler.KeyDown();
+                return true;
+            }
+
+            return base.ProcessCmdKey(ref msg, keyData);
+        }
+
+        protected override bool ProcessKeyPreview(ref Message m)
+        {
+            const int WM_KEYUP = 0x0101;
+
+            if (m.Msg == WM_KEYUP && (Keys)m.WParam == Keys.ControlKey)
+            {
+                gridToggler.KeyUp();
+                return true;
+            }
+
+            return base.ProcessKeyPreview(ref m);
+        }
+
     }
 }
