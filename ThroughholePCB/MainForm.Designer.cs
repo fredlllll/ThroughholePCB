@@ -59,6 +59,7 @@
             propertyGrid = new PropertyGrid();
             splitContainer1 = new SplitContainer();
             splitContainer2 = new SplitContainer();
+            toolResistor = new ToolStripButton();
             menuStrip1.SuspendLayout();
             toolStrip1.SuspendLayout();
             statusStrip1.SuspendLayout();
@@ -157,7 +158,7 @@
             // toolStrip1
             // 
             toolStrip1.ImageScalingSize = new Size(24, 24);
-            toolStrip1.Items.AddRange(new ToolStripItem[] { toolWireBtn, toolHoleBtn, toolFreeLine, toolStripSeparator2, toolGridBtn, toolStripSeparator4, toolActiveLayer });
+            toolStrip1.Items.AddRange(new ToolStripItem[] { toolWireBtn, toolHoleBtn, toolFreeLine, toolResistor, toolStripSeparator2, toolGridBtn, toolStripSeparator4, toolActiveLayer });
             toolStrip1.Location = new Point(0, 24);
             toolStrip1.Name = "toolStrip1";
             toolStrip1.Size = new Size(837, 31);
@@ -324,6 +325,15 @@
             splitContainer2.SplitterDistance = 150;
             splitContainer2.TabIndex = 6;
             // 
+            // toolResistor
+            // 
+            toolResistor.DisplayStyle = ToolStripItemDisplayStyle.Image;
+            toolResistor.Image = (Image)resources.GetObject("toolResistor.Image");
+            toolResistor.ImageTransparentColor = Color.Magenta;
+            toolResistor.Name = "toolResistor";
+            toolResistor.Size = new Size(28, 28);
+            toolResistor.Text = "toolStripButton1";
+            // 
             // MainForm
             // 
             AutoScaleDimensions = new SizeF(7F, 15F);
@@ -387,5 +397,6 @@
         private ToolStripMenuItem editToolStripMenuItem;
         private ToolStripMenuItem resizeBoardToolStripMenuItem;
         private Panel panel2;
+        private ToolStripButton toolResistor;
     }
 }

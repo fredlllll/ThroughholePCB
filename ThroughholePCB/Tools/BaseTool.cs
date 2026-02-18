@@ -1,4 +1,5 @@
-﻿using System;
+﻿using Microsoft.VisualBasic.Logging;
+using System;
 using System.Collections.Generic;
 using System.Drawing;
 using System.Linq;
@@ -11,6 +12,27 @@ namespace ThroughholePCB.Tools
     {
         protected MainForm mainForm;
         protected ToolStripButton button;
+
+        protected PrinterData CurrentPrinter
+        {
+            get { return mainForm.CurrentPrinter; }
+        }
+
+        protected float PixelsPerMm
+        {
+            get
+            {
+                return (CurrentPrinter.PixelsPerMmX + CurrentPrinter.PixelsPerMmY) / 2;
+            }
+        }
+
+        protected float MmPerPixel
+        {
+            get
+            {
+                return (CurrentPrinter.MmPerPixelX + CurrentPrinter.MmPerPixelY) / 2;
+            }
+        }
 
         public BaseTool(MainForm mainForm, ToolStripButton button)
         {
@@ -40,6 +62,7 @@ namespace ThroughholePCB.Tools
             mainForm.layeredCanvas.MouseUp += WorkareaPictureBox_MouseUp;
             mainForm.layeredCanvas.MouseMove += WorkareaPictureBox_MouseMove;
             mainForm.layeredCanvas.Paint += WorkareaPictureBox_Paint;
+            button.Checked = true;
         }
 
         public virtual void Disable()
@@ -48,6 +71,7 @@ namespace ThroughholePCB.Tools
             mainForm.layeredCanvas.MouseUp -= WorkareaPictureBox_MouseUp;
             mainForm.layeredCanvas.MouseMove -= WorkareaPictureBox_MouseMove;
             mainForm.layeredCanvas.Paint -= WorkareaPictureBox_Paint;
+            button.Checked = false;
         }
         protected virtual void WorkareaPictureBox_MouseDown(object? sender, MouseEventArgs e)
         {

@@ -19,6 +19,7 @@ namespace ThroughholePCB
         private WireTool wireTool;
         private HoleTool holeTool;
         private FreeLineTool freeLineTool;
+        private ResistorTool resistorTool;
 
         private GridToggler gridToggler;
 
@@ -37,6 +38,7 @@ namespace ThroughholePCB
             wireTool = new WireTool(this, toolWireBtn);
             holeTool = new HoleTool(this, toolHoleBtn);
             freeLineTool = new FreeLineTool(this, toolFreeLine);
+            resistorTool = new ResistorTool(this, toolResistor);
 
             //populate layer dropdown;
             foreach (var n in LayerInfos.AllLayerInfos)
