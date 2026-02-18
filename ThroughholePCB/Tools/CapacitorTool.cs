@@ -7,7 +7,7 @@ using System.Threading.Tasks;
 
 namespace ThroughholePCB.Tools
 {
-    public class ResistorTool : ABToolBase
+    public class CapacitorTool : ABToolBase
     {
         private Pen pen;
 
@@ -23,7 +23,7 @@ namespace ThroughholePCB.Tools
             set { pen.Width = value; }
         }
 
-        public ResistorTool(MainForm mainForm, ToolStripButton button) : base(mainForm, button)
+        public CapacitorTool(MainForm mainForm, ToolStripButton button) : base(mainForm, button)
         {
             pen = new Pen(Brushes.White, 1);
         }
@@ -45,8 +45,8 @@ namespace ThroughholePCB.Tools
                 return;//dont draw if length is 0 to prevent the math from exploding
             }
 
-            float leadLengthPx = MathF.Min(PixelsPerMm * 4, se.Length() / 3);
-            float bodyLengthPx = se.Length() - leadLengthPx;
+            float bodyLengthPx = PixelsPerMm * 0.3f;
+            float leadLengthPx = (se.Length() - bodyLengthPx)/2;
             float bodyWidthPx = PixelsPerMm * 3;
 
             var forward = Vector2.Normalize(se);
@@ -65,8 +65,6 @@ namespace ThroughholePCB.Tools
             var bodyRightBottom = leadRightEnd + right * bodyWidthPx / 2;
             g.DrawLine(pen, bodyLeftBottom.ToPoint(), bodyLeftTop.ToPoint());
             g.DrawLine(pen, bodyRightBottom.ToPoint(), bodyRightTop.ToPoint());
-            g.DrawLine(pen, bodyLeftTop.ToPoint(), bodyRightTop.ToPoint());
-            g.DrawLine(pen, bodyLeftBottom.ToPoint(), bodyRightBottom.ToPoint());
         }
     }
 }

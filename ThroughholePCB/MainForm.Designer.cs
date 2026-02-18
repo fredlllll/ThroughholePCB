@@ -45,6 +45,8 @@
             toolWireBtn = new ToolStripButton();
             toolHoleBtn = new ToolStripButton();
             toolFreeLine = new ToolStripButton();
+            toolResistor = new ToolStripButton();
+            toolText = new ToolStripButton();
             toolStripSeparator2 = new ToolStripSeparator();
             toolGridBtn = new ToolStripButton();
             toolStripSeparator4 = new ToolStripSeparator();
@@ -59,7 +61,13 @@
             propertyGrid = new PropertyGrid();
             splitContainer1 = new SplitContainer();
             splitContainer2 = new SplitContainer();
-            toolResistor = new ToolStripButton();
+            toolCapacitor = new ToolStripButton();
+            toolInductor = new ToolStripButton();
+            toolBattery = new ToolStripButton();
+            toolDiode = new ToolStripButton();
+            toolSwitch = new ToolStripButton();
+            toolGround = new ToolStripButton();
+            toolTransistor = new ToolStripButton();
             menuStrip1.SuspendLayout();
             toolStrip1.SuspendLayout();
             statusStrip1.SuspendLayout();
@@ -158,7 +166,7 @@
             // toolStrip1
             // 
             toolStrip1.ImageScalingSize = new Size(24, 24);
-            toolStrip1.Items.AddRange(new ToolStripItem[] { toolWireBtn, toolHoleBtn, toolFreeLine, toolResistor, toolStripSeparator2, toolGridBtn, toolStripSeparator4, toolActiveLayer });
+            toolStrip1.Items.AddRange(new ToolStripItem[] { toolWireBtn, toolHoleBtn, toolFreeLine, toolResistor, toolCapacitor, toolInductor, toolDiode, toolSwitch, toolBattery, toolGround, toolTransistor, toolText, toolStripSeparator2, toolGridBtn, toolStripSeparator4, toolActiveLayer });
             toolStrip1.Location = new Point(0, 24);
             toolStrip1.Name = "toolStrip1";
             toolStrip1.Size = new Size(837, 31);
@@ -190,7 +198,25 @@
             toolFreeLine.ImageTransparentColor = Color.Magenta;
             toolFreeLine.Name = "toolFreeLine";
             toolFreeLine.Size = new Size(28, 28);
-            toolFreeLine.Text = "toolStripButton1";
+            toolFreeLine.Text = "Free Line Tool";
+            // 
+            // toolResistor
+            // 
+            toolResistor.DisplayStyle = ToolStripItemDisplayStyle.Image;
+            toolResistor.Image = (Image)resources.GetObject("toolResistor.Image");
+            toolResistor.ImageTransparentColor = Color.Magenta;
+            toolResistor.Name = "toolResistor";
+            toolResistor.Size = new Size(28, 28);
+            toolResistor.Text = "Resistor Tool";
+            // 
+            // toolText
+            // 
+            toolText.DisplayStyle = ToolStripItemDisplayStyle.Image;
+            toolText.Image = (Image)resources.GetObject("toolText.Image");
+            toolText.ImageTransparentColor = Color.Magenta;
+            toolText.Name = "toolText";
+            toolText.Size = new Size(28, 28);
+            toolText.Text = "Text Tool";
             // 
             // toolStripSeparator2
             // 
@@ -325,14 +351,68 @@
             splitContainer2.SplitterDistance = 150;
             splitContainer2.TabIndex = 6;
             // 
-            // toolResistor
+            // toolCapacitor
             // 
-            toolResistor.DisplayStyle = ToolStripItemDisplayStyle.Image;
-            toolResistor.Image = (Image)resources.GetObject("toolResistor.Image");
-            toolResistor.ImageTransparentColor = Color.Magenta;
-            toolResistor.Name = "toolResistor";
-            toolResistor.Size = new Size(28, 28);
-            toolResistor.Text = "toolStripButton1";
+            toolCapacitor.DisplayStyle = ToolStripItemDisplayStyle.Image;
+            toolCapacitor.Image = (Image)resources.GetObject("toolCapacitor.Image");
+            toolCapacitor.ImageTransparentColor = Color.Magenta;
+            toolCapacitor.Name = "toolCapacitor";
+            toolCapacitor.Size = new Size(28, 28);
+            toolCapacitor.Text = "Capacitor Tool";
+            // 
+            // toolInductor
+            // 
+            toolInductor.DisplayStyle = ToolStripItemDisplayStyle.Image;
+            toolInductor.Image = (Image)resources.GetObject("toolInductor.Image");
+            toolInductor.ImageTransparentColor = Color.Magenta;
+            toolInductor.Name = "toolInductor";
+            toolInductor.Size = new Size(28, 28);
+            toolInductor.Text = "Inductor Tool";
+            // 
+            // toolBattery
+            // 
+            toolBattery.DisplayStyle = ToolStripItemDisplayStyle.Image;
+            toolBattery.Image = (Image)resources.GetObject("toolBattery.Image");
+            toolBattery.ImageTransparentColor = Color.Magenta;
+            toolBattery.Name = "toolBattery";
+            toolBattery.Size = new Size(28, 28);
+            toolBattery.Text = "Capacitor Tool";
+            // 
+            // toolDiode
+            // 
+            toolDiode.DisplayStyle = ToolStripItemDisplayStyle.Image;
+            toolDiode.Image = (Image)resources.GetObject("toolDiode.Image");
+            toolDiode.ImageTransparentColor = Color.Magenta;
+            toolDiode.Name = "toolDiode";
+            toolDiode.Size = new Size(28, 28);
+            toolDiode.Text = "Diode Tool";
+            // 
+            // toolSwitch
+            // 
+            toolSwitch.DisplayStyle = ToolStripItemDisplayStyle.Image;
+            toolSwitch.Image = (Image)resources.GetObject("toolSwitch.Image");
+            toolSwitch.ImageTransparentColor = Color.Magenta;
+            toolSwitch.Name = "toolSwitch";
+            toolSwitch.Size = new Size(28, 28);
+            toolSwitch.Text = "Switch Tool";
+            // 
+            // toolGround
+            // 
+            toolGround.DisplayStyle = ToolStripItemDisplayStyle.Image;
+            toolGround.Image = (Image)resources.GetObject("toolGround.Image");
+            toolGround.ImageTransparentColor = Color.Magenta;
+            toolGround.Name = "toolGround";
+            toolGround.Size = new Size(28, 28);
+            toolGround.Text = "Ground Tool";
+            // 
+            // toolTransistor
+            // 
+            toolTransistor.DisplayStyle = ToolStripItemDisplayStyle.Image;
+            toolTransistor.Image = (Image)resources.GetObject("toolTransistor.Image");
+            toolTransistor.ImageTransparentColor = Color.Magenta;
+            toolTransistor.Name = "toolTransistor";
+            toolTransistor.Size = new Size(28, 28);
+            toolTransistor.Text = "Transistor Tool";
             // 
             // MainForm
             // 
@@ -398,5 +478,13 @@
         private ToolStripMenuItem resizeBoardToolStripMenuItem;
         private Panel panel2;
         private ToolStripButton toolResistor;
+        private ToolStripButton toolText;
+        private ToolStripButton toolCapacitor;
+        private ToolStripButton toolInductor;
+        private ToolStripButton toolBattery;
+        private ToolStripButton toolDiode;
+        private ToolStripButton toolSwitch;
+        private ToolStripButton toolGround;
+        private ToolStripButton toolTransistor;
     }
 }

@@ -20,6 +20,9 @@ namespace ThroughholePCB
         private HoleTool holeTool;
         private FreeLineTool freeLineTool;
         private ResistorTool resistorTool;
+        private TextTool textTool;
+        private CapacitorTool capacitorTool;
+        private InductorTool inductorTool;
 
         private GridToggler gridToggler;
 
@@ -39,6 +42,9 @@ namespace ThroughholePCB
             holeTool = new HoleTool(this, toolHoleBtn);
             freeLineTool = new FreeLineTool(this, toolFreeLine);
             resistorTool = new ResistorTool(this, toolResistor);
+            textTool = new TextTool(this, toolText);
+            capacitorTool = new CapacitorTool(this, toolCapacitor);
+            inductorTool = new InductorTool(this, toolInductor);
 
             //populate layer dropdown;
             foreach (var n in LayerInfos.AllLayerInfos)

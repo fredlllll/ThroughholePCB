@@ -7,7 +7,7 @@ using System.Threading.Tasks;
 
 namespace ThroughholePCB.Tools
 {
-    public class ResistorTool : ABToolBase
+    public class InductorTool : ABToolBase
     {
         private Pen pen;
 
@@ -23,7 +23,7 @@ namespace ThroughholePCB.Tools
             set { pen.Width = value; }
         }
 
-        public ResistorTool(MainForm mainForm, ToolStripButton button) : base(mainForm, button)
+        public InductorTool(MainForm mainForm, ToolStripButton button) : base(mainForm, button)
         {
             pen = new Pen(Brushes.White, 1);
         }
@@ -45,7 +45,7 @@ namespace ThroughholePCB.Tools
                 return;//dont draw if length is 0 to prevent the math from exploding
             }
 
-            float leadLengthPx = MathF.Min(PixelsPerMm * 4, se.Length() / 3);
+            float leadLengthPx = MathF.Min(PixelsPerMm * 4, se.Length() / 4);
             float bodyLengthPx = se.Length() - leadLengthPx;
             float bodyWidthPx = PixelsPerMm * 3;
 
@@ -59,14 +59,41 @@ namespace ThroughholePCB.Tools
             g.DrawLine(pen, startPos, leadLeftEnd.ToPoint());
             g.DrawLine(pen, endPos, leadRightEnd.ToPoint());
 
-            var bodyLeftTop = leadLeftEnd + left * bodyWidthPx / 2;
-            var bodyLeftBottom = leadLeftEnd + right * bodyWidthPx / 2;
-            var bodyRightTop = leadRightEnd + left * bodyWidthPx / 2;
-            var bodyRightBottom = leadRightEnd + right * bodyWidthPx / 2;
-            g.DrawLine(pen, bodyLeftBottom.ToPoint(), bodyLeftTop.ToPoint());
-            g.DrawLine(pen, bodyRightBottom.ToPoint(), bodyRightTop.ToPoint());
-            g.DrawLine(pen, bodyLeftTop.ToPoint(), bodyRightTop.ToPoint());
-            g.DrawLine(pen, bodyLeftBottom.ToPoint(), bodyRightBottom.ToPoint());
+
+
+
+            //generate points
+
+
+            var coilVec = leadRightEnd - leadLeftEnd;
+            int loops = (int)(coilVec.Length() / 20);
+            float amplitude = 3 * PixelsPerMm;
+            float segment = coilVec.Length() / loops;
+            List<Vector2> pts = new List<Vector2>();
+
+            // Add the very first anchor
+            pts.Add(new Vector2(0, 0));
+
+            for (int i = 0; i < loops; i++)
+            {
+                float x0 = i * segment;
+                float x3 = (i + 1) * segment;
+
+                float x1 = x0 + segment * 0.25f;
+                float x2 = x0 + segment * 0.75f;
+
+                // Control points + next anchor
+                pts.Add(new Vector2(x1, amplitude)); // C1
+                pts.Add(new Vector2(x2, amplitude)); // C2
+                pts.Add(new Vector2(x3, 0));         // Pn
+            }
+
+
+            PointF[] world = pts.Select(p => (leadLeftEnd + forward * p.X + left * p.Y).ToPointF()).ToArray();
+
+            //draw coil
+            g.DrawBeziers(pen, world);
+
         }
     }
 }
